@@ -1,0 +1,12 @@
+name: FastMapper
+version: ${version}
+main: org.lime.fastmapper.FastMapperPlugin
+libraries:
+  - io.grpc:grpc-protobuf:${versionGrpc}
+  - io.grpc:grpc-stub:${versionGrpc}
+  - io.grpc:grpc-auth:${versionGrpc}
+  - io.grpc:grpc-netty:${versionGrpc}
+api-version: '1.21'
+authors: [Lime]
+softdepend:
+  - LimeCore
