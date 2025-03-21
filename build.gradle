@@ -103,6 +103,12 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from(components["java"])
+            pom.withXml {
+                def dependenciesNode = asNode().dependencies
+                if (dependenciesNode) {
+                    dependenciesNode.replaceNode {}
+                }
+            }
         }
     }
     repositories {
