@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.lime.fastmapper.test.protobuf.common";
+
+package common;
+
+message Common {
+  message RgbColor {
+    float r = 1;
+    float g = 2;
+    float b = 3;
+  }
+  message Guid {
+    int64 most_sig_bits = 1;
+    int64 least_sig_bits = 2;
+  }
+  message SlotId {
+    int32 x = 1;
+    int32 y = 2;
+  }
+  message SlotRange {
+    SlotId from = 1;
+    SlotId to = 2;
+  }
+  message Font {
+    string key = 1;
+    int32 height = 2;
+    map<int32, string> char_width = 3;
+    int32 default_width = 4;
+  }
+
+  message OptionalSlot {
+    Guid id = 1;
+    optional int32 count = 2;
+    optional SlotRange range = 3;
+  }
+}

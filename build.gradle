@@ -1,0 +1,145 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id "fr.brouillard.oss.gradle.jgitver" version "+"
+    id 'com.google.protobuf' version "${versionProtobufGradle}"
+}
+
+//<editor-fold desc="Settings: Plugin">
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
+    testImplementation 'org.ow2.asm:asm:9.7.1'
+}
+
+version = "$version";
+if (version.contains('-')) {
+    String[] argsVersion = version.split('-', 2);
+    if (argsVersion[1] == "0") {
+        version = argsVersion[0];
+    } else {
+        version = "${argsVersion[0]}-alpha.${argsVersion[1]}";
+    }
+}
+
+task printVersion {
+    println "Project version: $version"
+}
+//</editor-fold>
+
+//<editor-fold desc="Settings: Java">
+int targetJavaVersion = 23
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release = targetJavaVersion
+    }
+}
+//</editor-fold>
+
+//<editor-fold desc="Settings: Grpc">
+dependencies {
+    implementation("io.grpc:grpc-protobuf:${versionGrpc}") {
+        exclude group: 'com.google.protobuf', module: 'protobuf-java'
+    }
+    implementation "io.grpc:grpc-stub:${versionGrpc}"
+    implementation "io.grpc:grpc-auth:${versionGrpc}"
+    implementation "io.grpc:grpc-netty:${versionGrpc}"
+
+    implementation "com.google.protobuf:protobuf-java:${versionProtobuf}"
+
+    compileOnly "org.apache.tomcat:annotations-api:6.0.53"
+}
+
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:${versionProtobuf}" }
+    plugins {
+        grpc { artifact = "io.grpc:protoc-gen-grpc-java:${versionGrpc}" }
+    }
+    generateProtoTasks {
+        all()*.plugins { grpc {} }
+    }
+}
+
+jar {
+    exclude('*.proto')
+}
+//</editor-fold>
+
+//<editor-fold desc="Settings: Test">
+dependencies {
+    testImplementation(platform('org.junit:junit-bom:5.12.1'))
+    testImplementation('org.junit.jupiter:junit-jupiter:5.12.1')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher:1.12.1')
+}
+
+test {
+    useJUnitPlatform()
+    jvmArgs(
+            '-Djdk.reflect.useDirectMethodHandle=false',
+            '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+            '--add-opens', 'java.base/java.util=ALL-UNNAMED',
+            '--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED',
+    )
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+//</editor-fold>
+
+//<editor-fold desc="Settings: Maven">
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from(components["java"])
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY")}")
+            credentials {
+                username = System.getenv("GITHUB_OWNER")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+//</editor-fold>
+
+//<editor-fold desc="Settings: Libraries">
+//<editor-fold desc="Settings: Libraries: org.lime.core">
+repositories {
+    maven {
+        url = "https://maven.pkg.github.com/code-lime/org.lime.core"
+        credentials {
+            username = System.getenv("GITHUB_PACKAGE_USERNAME")
+            password = System.getenv("GITHUB_PACKAGE_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation "org.lime:core:${versionCore}"
+}
+//</editor-fold>
+//</editor-fold>
+
+//<editor-fold desc="Settings: Clean output folder">
+task cleanJarOutput(type: Delete) {
+    delete jar.destinationDirectory
+}
+
+jar.dependsOn(cleanJarOutput)
+//</editor-fold>

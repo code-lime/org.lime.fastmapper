@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+import "common.proto";
+
+option java_multiple_files = true;
+option java_package = "org.lime.fastmapper.test.protobuf.oneof";
+
+package oneof;
+
+message Entry {
+  oneof type {
+    Image image = 1;
+    Text text = 2;
+    Raw raw = 3;
+  }
+
+  message Offset {
+    int32 x = 1;
+    int32 y = 2;
+  }
+  message Image {
+    string font = 1;
+    common.Common.RgbColor color = 2;
+    int32 symbol = 3;
+    int32 width = 4;
+
+    Offset offset = 5;
+  }
+  message Text {
+    string font = 1;
+    common.Common.RgbColor color = 2;
+    optional common.Common.RgbColor shadow = 3;
+    int32 scroll_line = 4;
+    Anchor anchor = 5;
+    optional int32 max_width = 6;
+    optional int32 max_lines = 7;
+    repeated string lines = 8;
+
+    Offset offset = 9;
+
+    enum Anchor {
+      Center = 0;
+      Left = 1;
+      Right = 2;
+
+      Top = 3;
+      TopLeft = 4;
+      TopRight = 5;
+
+      Bottom = 6;
+      BottomLeft = 7;
+      BottomRight = 8;
+    }
+  }
+  message Raw {
+    string component = 1;
+  }
+}

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "common.proto";
+
+option java_multiple_files = true;
+option java_package = "org.lime.fastmapper.test.protobuf.repeat";
+
+package repeat;
+
+message RepeatMessage {
+  common.Common.Guid id = 1;
+  int32 rows = 2;
+  string input = 3;
+
+  repeated common.Common.Guid guids = 4;
+  repeated common.Common.SlotRange slots = 5;
+}
