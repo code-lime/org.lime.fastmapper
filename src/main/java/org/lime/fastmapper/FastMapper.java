@@ -2,7 +2,6 @@ package org.lime.fastmapper;
 
 import com.google.common.collect.Streams;
 import com.google.common.primitives.Primitives;
-import com.google.protobuf.LazyStringArrayList;
 import org.lime.system.execute.Func1;
 import org.lime.system.tuple.Tuple;
 import org.lime.system.tuple.Tuple1;
