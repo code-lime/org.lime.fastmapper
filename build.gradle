@@ -22,7 +22,10 @@ if (version.contains('-')) {
         version = "${argsVersion[0]}-alpha.${argsVersion[1]}";
     }
 }
-
+println "Properties:"
+getProperties().forEach((a,b) -> {
+    println "$a=$b"
+})
 task printVersion {
     println "Project version: $version"
 }
