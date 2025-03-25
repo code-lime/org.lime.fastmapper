@@ -12,7 +12,6 @@ import org.lime.fastmapper.converter.SimpleTypeConverter;
 import org.lime.fastmapper.converter.TypeConverter;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Map;
@@ -101,51 +100,6 @@ public class FastMapper {
                     .findAny();
             return find.isEmpty() ? none : find.get();
         });
-    }
-
-    /**
-     * Рекурсивно ищет тип, соответствующий целевому классу target,
-     * начиная с переданного type.
-     *
-     * @param type   Начальный тип (например, из getGenericInterfaces() или getGenericSuperclass()).
-     * @param target Целевой класс или интерфейс (например, Map.class).
-     * @return Optional с найденным типом или Optional.empty(), если тип не найден.
-     */
-    public static Optional<Type> getGenericType(Type type, Class<?> target) {
-        // Если type является параметризованным, проверяем его сырой тип.
-        if (type instanceof ParameterizedType pt) {
-            if (pt.getRawType() instanceof Class) {
-                // Если сырой тип совпадает, возвращаем найденный тип.
-                if (target.equals(pt.getRawType())) {
-                    return Optional.of(type);
-                }
-                // Если не совпадает, пытаемся найти target в иерархии сырого типа.
-                Optional<Type> result = getGenericType(pt.getRawType(), target);
-                if (result.isPresent()) {
-                    return result;
-                }
-            }
-        }
-
-        // Если type является классом, рекурсивно ищем в его интерфейсах и суперклассе.
-        if (type instanceof Class<?> current) {
-            // Проверяем интерфейсы
-            for (Type iface : current.getGenericInterfaces()) {
-                Optional<Type> result = getGenericType(iface, target);
-                if (result.isPresent()) {
-                    return result;
-                }
-            }
-            // Проверяем суперкласс
-            Type superType = current.getGenericSuperclass();
-            if (superType != null) {
-                Optional<Type> result = getGenericType(superType, target);
-                if (result.isPresent()) {
-                    return result;
-                }
-            }
-        }
-        return Optional.empty();
     }
 
     public <In, Out> Tuple2<TypeConverter<In, Out>, GenTypePair<?,?>> converter(GenTypePair<In, Out> key) {
