@@ -1,5 +1,6 @@
 package org.lime.fastmapper.config;
 
+import org.lime.reflection.LambdaInfo;
 import org.lime.system.Lazy;
 import org.lime.system.execute.Action1;
 import org.lime.system.execute.Func1;
@@ -8,7 +9,6 @@ import org.lime.fastmapper.FastAccess;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.ReverseTypeConverter;
 import org.lime.fastmapper.converter.property.PropertyAccess;
-import patch.Native;
 
 import java.lang.reflect.Method;
 
@@ -71,7 +71,7 @@ public class AutoConfig<In, Out> {
     }
 
     public <E extends Enum<E>>AutoConfig<In, Out> oneOf(Func1<In, E> enumCase, Action1<OneOfConfig<In, Out, E>> config) {
-        Method method = Native.getMethod(Native.infoFromLambda(enumCase));
+        Method method = LambdaInfo.getMethod(enumCase);
         Class<E> eClass = (Class<E>)method.getReturnType();
         if (!eClass.isEnum())
             throw new IllegalArgumentException("Lambda return type "+eClass+" not enum");

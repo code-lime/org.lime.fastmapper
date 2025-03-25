@@ -1,6 +1,7 @@
 package org.lime.fastmapper.converter.property;
 
 import com.google.common.collect.ImmutableList;
+import org.lime.reflection.LambdaInfo;
 import org.lime.system.execute.Func1;
 import org.lime.system.execute.Func2;
 import org.lime.system.execute.Func3;
@@ -8,7 +9,6 @@ import org.lime.system.execute.ICallable;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.info.PropertyInfo;
 import org.lime.fastmapper.converter.property.info.PropertyLoader;
-import patch.Native;
 
 import java.util.stream.Stream;
 
@@ -45,7 +45,7 @@ public interface PropertyAccess<T> extends
         return this.<In>modifyRead(method, (_, _, v) -> modify.invoke(v));
     }
     default <In>PropertyAccess<T> modifyRead(ICallable method, Func3<FastMapper, T, PropertyContent<In>, PropertyContent<?>> modify) {
-        return PropertyLoader.extractInfo(Native.getMethod(Native.infoFromLambda(method)))
+        return PropertyLoader.extractInfo(LambdaInfo.getMethod(method))
                 .map(PropertyInfo::name)
                 .map(name -> modifyRead(name, modify))
                 .orElseThrow(() -> new IllegalArgumentException("Property from '"+modify+"' not found"));
