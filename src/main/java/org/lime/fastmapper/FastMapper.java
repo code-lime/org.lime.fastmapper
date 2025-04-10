@@ -2,7 +2,9 @@ package org.lime.fastmapper;
 
 import com.google.common.collect.Streams;
 import com.google.common.primitives.Primitives;
+import org.lime.system.execute.Action0;
 import org.lime.system.execute.Func1;
+import org.lime.system.tuple.LockTuple1;
 import org.lime.system.tuple.Tuple;
 import org.lime.system.tuple.Tuple1;
 import org.lime.system.tuple.Tuple2;
@@ -12,6 +14,7 @@ import org.lime.fastmapper.converter.SimpleTypeConverter;
 import org.lime.fastmapper.converter.TypeConverter;
 
 import javax.annotation.Nullable;
+import java.io.Closeable;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Map;
@@ -22,9 +25,18 @@ import java.util.stream.Stream;
 public class FastMapper {
     private final Map<TypePair<?,?>, TypeConverter<?,?>> mappers = new ConcurrentHashMap<>();
     private final Map<GenTypePair<?,?>, GenTypePair<?,?>> extendMap = new ConcurrentHashMap<>();
+    private final LockTuple1<Integer> overrideIterator = Tuple.lock(0);
 
     private FastMapper() {
 
+    }
+
+    public Action0 override() {
+        overrideIterator.invoke(v -> v.val0++);
+        return () -> overrideIterator.invoke(v -> v.val0--);
+    }
+    public boolean isOverride() {
+        return overrideIterator.get0() > 0;
     }
 
     public Iterable<TypePair<?,?>> keys() {
@@ -46,8 +58,9 @@ public class FastMapper {
     public <T>FastMapper addSimpleClone(Class<T> tClass, SimpleTypeConverter<T, T> converter) {
         return add(TypePair.of(tClass, tClass), converter);
     }
+
     public <In, Out>FastMapper add(TypePair<In, Out> key, TypeConverter<In, Out> converter) {
-        if (mappers.containsKey(key))
+        if (!isOverride() && mappers.containsKey(key))
             throw new IllegalArgumentException("Mapper key "+key+" already register");
         mappers.put(key, converter);
         extendMap.clear();
@@ -67,10 +80,7 @@ public class FastMapper {
     public <In, Out>FastMapper addAuto(TypePair<In, Out> key) {
         return addAuto(key, null);
     }
-    public <In, Out>FastMapper addAuto(
-            TypePair<In, Out> key,
-            @Nullable Func1<AutoConfig<In, Out>, AutoConfig<In, Out>> config) {
-
+    public <In, Out>FastMapper addAuto(TypePair<In, Out> key, @Nullable Func1<AutoConfig<In, Out>, AutoConfig<In, Out>> config) {
         var dat = new AutoConfig<>(this, key.tIn(), key.tOut());
         if (config != null)
             dat = config.invoke(dat);
@@ -150,6 +160,7 @@ public class FastMapper {
         var key = TypePair.of((Class<In>) value.getClass(), tOut);
         return map(key, value, inType, outType);
     }
+
     public <In, Out>Optional<Tuple1<Out>> tryMap(TypePair<In, Out> key, In value) {
         return tryMap(key, value, key.tIn(), key.tOut());
     }

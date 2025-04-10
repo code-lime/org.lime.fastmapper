@@ -22,7 +22,7 @@ import org.lime.fastmapper.converter.impl.MapTypeConverter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class GrpcMapperTest {
     private final FastMapper mapper;
@@ -108,6 +108,39 @@ class GrpcMapperTest {
         assertEquals(input, compare);
     }
 
+    @Test
+    void testOverride() {
+        FastMapper mapper = FastMapper.create();
+
+        mapper.addReverse(TypePair.of(Integer.class, String.class),
+                (_,v) -> v.toString(),
+                (_,v) -> Integer.parseInt(v));
+        assertEquals("10", mapper.map(10, String.class));
+        assertEquals(45, mapper.map("45", Integer.class));
+
+        try (var _ = mapper.override()) {
+            mapper.addReverse(TypePair.of(Integer.class, String.class),
+                    (_,v) -> "PREFIX:" + v.toString(),
+                    (_,v) -> Integer.parseInt(v.split(":", 2)[1]));
+            assertEquals("PREFIX:10", mapper.map(10, String.class));
+            assertEquals(45, mapper.map("PREFIX:45", Integer.class));
+        }
+
+        try (var _ = mapper.override()) {
+            try (var _ = mapper.override()) {
+                mapper.addReverse(TypePair.of(Integer.class, String.class),
+                        (_,v) -> "PREFIX:" + v.toString(),
+                        (_,v) -> Integer.parseInt(v.split(":", 2)[1]));
+                assertEquals("PREFIX:10", mapper.map(10, String.class));
+                assertEquals(45, mapper.map("PREFIX:45", Integer.class));
+            }
+        }
+
+        assertThrows(IllegalArgumentException.class,
+                () -> mapper.addReverse(TypePair.of(Integer.class, String.class),
+                        (_,v) -> "THROW:" + v.toString(),
+                        (_,v) -> Integer.parseInt(v.split(":", 2)[1])));
+    }
     @Test
     void testClone() {
         testInverseMap(new SlotId(2399, 991), SlotId.class);
