@@ -1,4 +1,4 @@
-name: FastMapper
+name: ${group}.fastmapper
 version: ${version}
 main: org.lime.fastmapper.FastMapperPlugin
 libraries:
@@ -9,4 +9,4 @@ libraries:
 api-version: '1.21'
 authors: [Lime]
 softdepend:
-  - LimeCore
+  - ${group}.core
