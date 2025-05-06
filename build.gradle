@@ -13,52 +13,17 @@ dependencies {
     paperweight.paperDevBundle("${versionPaper}")
 }
 
-version = "$version";
-boolean hasPostfixOriginal = false;
-if (version.contains('-')) {
-    hasPostfixOriginal = true;
-    String[] argsVersion = version.split('-', 2);
-    if (argsVersion[1] == "0") {
-        version = argsVersion[0];
-    } else {
-        version = "${argsVersion[0]}-alpha.${argsVersion[1]}";
-    }
-}
-var globalProps = getProperties();
-boolean isTagCommit = "LIGHTWEIGHT" == globalProps["base_tag_type"];
-if (!hasPostfixOriginal && !isTagCommit) {
-    var argsVersion = version.split('\\.');
-    int lastIndex = argsVersion.length - 1;
-    String lastValue = argsVersion[lastIndex];
-    try {
-        lastValue = Integer.toString(Integer.parseUnsignedInt(lastValue) + 1) + "-alpha.0";
-    } catch (ignored) {
-        lastValue = lastValue + "-unsafe";
-    }
-    argsVersion[lastIndex] = lastValue;
-    version = String.join(".", argsVersion);
-}
+apply from: 'https://raw.githubusercontent.com/code-lime/org.lime.core/refs/tags/2.0.3/global.gradle'
+apply from: 'https://raw.githubusercontent.com/code-lime/org.lime.core/refs/tags/2.0.3/version.gradle'
 
-task printVersion {
-    println "Project version: $version"
-}
+println "Project version: $version"
 
 paperweight.reobfArtifactConfiguration = ReobfArtifactConfiguration.getMOJANG_PRODUCTION()
 
 processResources {
-    def props =
-    [
-        group: "${project.group}",
-        version: "${version}",
-        versionGrpc: "${versionGrpc}",
-        versionProtobuf: "${versionProtobuf}",
-    ]
-
-    inputs.properties(props)
-    filteringCharset = 'UTF-8'
-    filesMatching('plugin.yml') {
-        expand(props)
-    }
+    configureProcessResources(delegate, "plugin.yml", [
+            group: "${project.group}",
+    ])
 }
 //</editor-fold>
 
@@ -84,32 +49,6 @@ protobuf {
     generateProtoTasks {
         all()*.plugins { grpc {} }
     }
-}
-//</editor-fold>
-
-//<editor-fold desc="Settings: Java">
-int targetJavaVersion = 23
-java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-    withSourcesJar()
-}
-
-tasks.withType(JavaCompile).configureEach {
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
-        options.release = targetJavaVersion
-    }
-}
-
-jar {
-    archiveFileName = "${project.group}.${archiveFileName.get()}"
-}
-sourcesJar {
-    archiveFileName = "${project.group}.${archiveFileName.get()}"
 }
 //</editor-fold>
 
@@ -170,12 +109,4 @@ dependencies {
     implementation "org.lime:core:${versionCore}"
 }
 //</editor-fold>
-//</editor-fold>
-
-//<editor-fold desc="Settings: Clean output folder">
-task cleanJarOutput(type: Delete) {
-    delete jar.destinationDirectory
-}
-
-jar.dependsOn(cleanJarOutput)
 //</editor-fold>
