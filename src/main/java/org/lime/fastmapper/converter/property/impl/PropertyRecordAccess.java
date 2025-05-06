@@ -1,11 +1,11 @@
 package org.lime.fastmapper.converter.property.impl;
 
 import com.google.common.primitives.Primitives;
-import org.lime.reflection.Lambda;
-import org.lime.reflection.ReflectionConstructor;
-import org.lime.system.Lazy;
-import org.lime.system.execute.Func1;
-import org.lime.system.execute.ICallable;
+import org.lime.core.common.reflection.Lambda;
+import org.lime.core.common.reflection.ReflectionConstructor;
+import org.lime.core.common.system.Lazy;
+import org.lime.core.common.system.execute.Func1;
+import org.lime.core.common.system.execute.Callable;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.PropertyAccess;
 import org.lime.fastmapper.converter.property.PropertyContent;
@@ -22,7 +22,7 @@ public class PropertyRecordAccess<T extends Record>
     private final int size;
     private final Map<String, RecordField<?>> fields = new HashMap<>();
     private final RecordField<?>[] fieldsArray;
-    private final ICallable constructor;
+    private final Callable constructor;
 
     public PropertyRecordAccess(Class<T> tClass) {
         this.tClass = tClass;

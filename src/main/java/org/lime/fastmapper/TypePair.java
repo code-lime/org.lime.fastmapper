@@ -25,4 +25,3 @@ public record TypePair<In, Out>(Class<In> tIn, Class<Out> tOut) {
         return new GenTypePair<>(this, inGen, outGen);
     }
 }
-

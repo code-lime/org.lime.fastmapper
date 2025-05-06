@@ -1,6 +1,6 @@
 package org.lime.fastmapper.converter.property.impl;
 
-import org.lime.system.Lazy;
+import org.lime.core.common.system.Lazy;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.PropertyAccess;
 import org.lime.fastmapper.converter.property.PropertyContent;

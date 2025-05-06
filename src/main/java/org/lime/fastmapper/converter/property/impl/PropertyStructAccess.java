@@ -1,12 +1,12 @@
 package org.lime.fastmapper.converter.property.impl;
 
 import com.google.common.primitives.Primitives;
-import org.lime.reflection.Lambda;
-import org.lime.reflection.ReflectionConstructor;
-import org.lime.system.Lazy;
-import org.lime.system.execute.Action2;
-import org.lime.system.execute.Func0;
-import org.lime.system.execute.Func1;
+import org.lime.core.common.reflection.Lambda;
+import org.lime.core.common.reflection.ReflectionConstructor;
+import org.lime.core.common.system.Lazy;
+import org.lime.core.common.system.execute.Action2;
+import org.lime.core.common.system.execute.Func0;
+import org.lime.core.common.system.execute.Func1;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.PropertyAccess;
 import org.lime.fastmapper.converter.property.PropertyContent;

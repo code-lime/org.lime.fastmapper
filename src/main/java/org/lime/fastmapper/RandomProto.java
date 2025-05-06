@@ -4,9 +4,9 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Message;
-import org.lime.reflection.ReflectionMethod;
-import org.lime.system.execute.Func1;
-import org.lime.system.execute.Func2;
+import org.lime.core.common.reflection.ReflectionMethod;
+import org.lime.core.common.system.execute.Func1;
+import org.lime.core.common.system.execute.Func2;
 import org.lime.fastmapper.converter.property.info.PropertyLoader;
 
 import java.util.*;

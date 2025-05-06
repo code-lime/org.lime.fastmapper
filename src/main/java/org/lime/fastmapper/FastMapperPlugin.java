@@ -1,16 +1,16 @@
 package org.lime.fastmapper;
 
-import org.lime.LimeCore;
+import org.lime.core.paper.CoreInstancePlugin;
 
-public class FastMapperPlugin extends LimeCore {
-    public static FastMapperPlugin _plugin;
+public class FastMapperPlugin extends CoreInstancePlugin {
+    public static FastMapperPlugin instance;
 
     @Override
-    public String getLogPrefix() {
+    public String logPrefix() {
         return "FastMapper";
     }
     @Override
-    public String getConfigFile() {
+    public String configFile() {
         return "plugins/fastmapper/";
     }
 }

@@ -1,9 +1,9 @@
 package org.lime.fastmapper.converter.property.impl;
 
 import com.google.common.collect.ImmutableMap;
-import org.lime.reflection.ReflectionMethod;
-import org.lime.system.Lazy;
-import org.lime.system.execute.Func1;
+import org.lime.core.common.reflection.ReflectionMethod;
+import org.lime.core.common.system.Lazy;
+import org.lime.core.common.system.execute.Func1;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.PropertyAccess;
 import org.lime.fastmapper.converter.property.PropertyContent;

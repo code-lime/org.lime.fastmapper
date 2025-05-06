@@ -1,10 +1,10 @@
 package org.lime.fastmapper.config;
 
-import org.lime.reflection.LambdaInfo;
-import org.lime.system.Lazy;
-import org.lime.system.execute.Action1;
-import org.lime.system.execute.Func1;
-import org.lime.system.execute.Func2;
+import org.lime.core.common.reflection.LambdaInfo;
+import org.lime.core.common.system.Lazy;
+import org.lime.core.common.system.execute.Action1;
+import org.lime.core.common.system.execute.Func1;
+import org.lime.core.common.system.execute.Func2;
 import org.lime.fastmapper.FastAccess;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.ReverseTypeConverter;

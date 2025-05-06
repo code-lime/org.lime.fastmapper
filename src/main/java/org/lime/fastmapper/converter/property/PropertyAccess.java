@@ -1,11 +1,11 @@
 package org.lime.fastmapper.converter.property;
 
 import com.google.common.collect.ImmutableList;
-import org.lime.reflection.LambdaInfo;
-import org.lime.system.execute.Func1;
-import org.lime.system.execute.Func2;
-import org.lime.system.execute.Func3;
-import org.lime.system.execute.ICallable;
+import org.lime.core.common.reflection.LambdaInfo;
+import org.lime.core.common.system.execute.Callable;
+import org.lime.core.common.system.execute.Func1;
+import org.lime.core.common.system.execute.Func2;
+import org.lime.core.common.system.execute.Func3;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.info.PropertyInfo;
 import org.lime.fastmapper.converter.property.info.PropertyLoader;
@@ -41,10 +41,10 @@ public interface PropertyAccess<T> extends
         }
     }
 
-    default <In>PropertyAccess<T> modifyRead(ICallable method, Func1<PropertyContent<In>, PropertyContent<?>> modify) {
+    default <In>PropertyAccess<T> modifyRead(Callable method, Func1<PropertyContent<In>, PropertyContent<?>> modify) {
         return this.<In>modifyRead(method, (_, _, v) -> modify.invoke(v));
     }
-    default <In>PropertyAccess<T> modifyRead(ICallable method, Func3<FastMapper, T, PropertyContent<In>, PropertyContent<?>> modify) {
+    default <In>PropertyAccess<T> modifyRead(Callable method, Func3<FastMapper, T, PropertyContent<In>, PropertyContent<?>> modify) {
         return PropertyLoader.extractInfo(LambdaInfo.getMethod(method))
                 .map(PropertyInfo::name)
                 .map(name -> modifyRead(name, modify))

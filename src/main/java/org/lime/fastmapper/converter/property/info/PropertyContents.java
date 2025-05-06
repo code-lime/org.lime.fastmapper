@@ -1,6 +1,6 @@
 package org.lime.fastmapper.converter.property.info;
 
-import org.lime.system.execute.Func1;
+import org.lime.core.common.system.execute.Func1;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.PropertyContent;
 
