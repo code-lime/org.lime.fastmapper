@@ -1,6 +1,8 @@
 package org.lime.fastmapper;
 
 import com.google.protobuf.Message;
+import org.jetbrains.annotations.Nullable;
+import org.lime.core.common.system.execute.Func0;
 import org.lime.core.common.system.execute.Func1;
 import org.lime.core.common.system.tuple.Tuple;
 import org.lime.core.common.system.tuple.Tuple2;
@@ -45,6 +47,9 @@ public class FastAccess {
     }
     public static <T, B> PropertyBuilderAccess<T, B> builderAccess(Class<T> tClass) {
         return accessCache(PropertyBuilderAccess.class, tClass, PropertyBuilderAccess::new);
+    }
+    public static <T, B> PropertyBuilderAccess<T, B> builderAccess(Class<T> tClass, @Nullable Func0<B> newBuilderFunc, @Nullable Func1<B, T> buildFunc) {
+        return accessCache(PropertyBuilderAccess.class, tClass, v -> new PropertyBuilderAccess<>(v, newBuilderFunc, buildFunc));
     }
     public static <T extends Message, B extends Message.Builder> PropertyProtoAccess<T, B> protoAccess(Class<T> tClass) {
         return accessCache(PropertyProtoAccess.class, tClass, PropertyProtoAccess::new);

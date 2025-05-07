@@ -2,7 +2,9 @@ package org.lime.fastmapper.converter.property.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.jetbrains.annotations.Nullable;
 import org.lime.core.common.reflection.ReflectionMethod;
+import org.lime.core.common.system.Lazy;
 import org.lime.core.common.system.execute.Func0;
 import org.lime.core.common.system.execute.Func1;
 import org.lime.fastmapper.FastMapper;
@@ -42,25 +44,33 @@ public class PropertyBuilderAccess<T, B> implements
     private boolean optionPrefixOnly = false;
 
     public PropertyBuilderAccess(Class<T> tClass) {
+        this(tClass, null, null);
+    }
+    public PropertyBuilderAccess(Class<T> tClass, @Nullable Func0<B> newBuilderFunc, @Nullable Func1<B, T> buildFunc) {
         this.tClass = tClass;
         tBuilder = findBuilderClass(tClass);
 
-        var builderRefMethod = ReflectionMethod.of(tClass, "newBuilder");
-        var builderMethod = builderRefMethod.method();
-        if (!Modifier.isStatic(builderMethod.getModifiers())
-                || !builderMethod.getReturnType().equals(tBuilder)
-                || builderMethod.getParameterCount() != 0)
-            throw new IllegalArgumentException("Method static " + tClass + ".newBuilder() not found");
+        if (newBuilderFunc == null) {
+            var builderRefMethod = ReflectionMethod.of(tClass, "newBuilder");
+            var builderMethod = builderRefMethod.method();
+            if (!Modifier.isStatic(builderMethod.getModifiers())
+                    || !builderMethod.getReturnType().equals(tBuilder)
+                    || builderMethod.getParameterCount() != 0)
+                throw new IllegalArgumentException("Method static " + tClass + ".newBuilder() not found");
+            newBuilderFunc = builderRefMethod.lambda(Func0.class);
+        }
+        this.newBuilderFunc = newBuilderFunc;
 
-        var buildRefMethod = ReflectionMethod.of(tBuilder, "build");
-        var buildMethod = buildRefMethod.method();
-        if (Modifier.isStatic(buildMethod.getModifiers())
-                || !buildMethod.getReturnType().equals(tClass)
-                || buildMethod.getParameterCount() != 0)
-            throw new IllegalArgumentException("Method instance " + tBuilder + ".build() not found");
-
-        newBuilderFunc = builderRefMethod.lambda(Func0.class);
-        buildFunc = buildRefMethod.lambda(Func1.class);
+        if (buildFunc == null) {
+            var buildRefMethod = ReflectionMethod.of(tBuilder, "build");
+            var buildMethod = buildRefMethod.method();
+            if (Modifier.isStatic(buildMethod.getModifiers())
+                    || !buildMethod.getReturnType().equals(tClass)
+                    || buildMethod.getParameterCount() != 0)
+                throw new IllegalArgumentException("Method instance " + tBuilder + ".build() not found");
+            buildFunc = buildRefMethod.lambda(Func1.class);
+        }
+        this.buildFunc = buildFunc;
 
         var readsContext = PropertyReadContext.<Method>createDefault(new HashMap<>());
         var writesContext = PropertyWriteContext.<Method>createDefault(new HashMap<>());
