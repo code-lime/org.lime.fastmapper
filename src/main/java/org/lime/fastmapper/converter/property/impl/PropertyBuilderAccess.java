@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.Nullable;
 import org.lime.core.common.reflection.ReflectionMethod;
-import org.lime.core.common.system.Lazy;
 import org.lime.core.common.system.execute.Func0;
 import org.lime.core.common.system.execute.Func1;
 import org.lime.fastmapper.FastMapper;
@@ -20,7 +19,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class PropertyBuilderAccess<T, B> implements
-        PropertyAccessOptions<PropertyBuilderAccess<T, B>, T, Method> {
+        PropertyAccessOptions<T, Method> {
     private static <B>Class<B> findBuilderClass(Class<?> tClass) {
         for (Class<?> tBuilder : tClass.getDeclaredClasses())
             if (tBuilder.getSimpleName().equals("Builder"))
@@ -40,8 +39,6 @@ public class PropertyBuilderAccess<T, B> implements
 
     private final Func0<B> newBuilderFunc;
     private final Func1<B, T> buildFunc;
-
-    private boolean optionPrefixOnly = false;
 
     public PropertyBuilderAccess(Class<T> tClass) {
         this(tClass, null, null);
@@ -93,47 +90,24 @@ public class PropertyBuilderAccess<T, B> implements
         PropertyLoader.loadProperties(tBuilder, null, writesContext, tBuilder);
     }
 
-    protected PropertyBuilderAccess(PropertyBuilderAccess<T, B> other) {
-        reads = other.reads;
-        writes = other.writes;
-        tClass = other.tClass;
-        tBuilder = other.tBuilder;
-        newBuilderFunc = other.newBuilderFunc;
-        buildFunc = other.buildFunc;
-        optionPrefixOnly = other.optionPrefixOnly;
-    }
-
     @Override
-    public boolean isPrefixOnly() {
-        return optionPrefixOnly;
-    }
-
-    @Override
-    public Stream<PropertyInfo.Read<?, Method>> reads() {
+    public Stream<PropertyInfo.Read<?, Method>> readProperties() {
         return reads.values().stream().flatMap(Collection::stream);
     }
 
     @Override
-    public Stream<PropertyInfo.Write<?, Method>> writes() {
+    public Stream<PropertyInfo.Write<?, Method>> writeProperties() {
         return writes.values().stream().flatMap(Collection::stream);
     }
 
     @Override
-    public PropertyBuilderAccess<T, B> withPrefixOnly(boolean enable) {
-        var clone = new PropertyBuilderAccess<>(this);
-        clone.optionPrefixOnly = enable;
-        return clone;
+    public Stream<PropertyContent<?>> readOf(FastMapper mapper, T value, Stream<PropertyInfo.Read<?, Method>> readProperties) {
+        return PropertyContents.read(value, readProperties);
     }
-
     @Override
-    public Stream<PropertyContent<?>> read(FastMapper mapper, T value) {
-        return PropertyContents.read(value, this::filterProperty, reads);
-    }
-
-    @Override
-    public T write(FastMapper mapper, Stream<PropertyContent<?>> properties) {
+    public T writeOf(FastMapper mapper, Stream<PropertyContent<?>> properties, Stream<PropertyInfo.Write<?, Method>> writeProperties) {
         B builder = newBuilderFunc.invoke();
-        PropertyContents.write(mapper, builder, writes, this::filterProperty, properties);
+        PropertyContents.write(mapper, builder, writeProperties, properties);
         return buildFunc.invoke(builder);
     }
 }

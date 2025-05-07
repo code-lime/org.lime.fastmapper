@@ -7,4 +7,3 @@ import java.util.stream.Stream;
 public interface PropertyReader<In> {
     Stream<PropertyContent<?>> read(FastMapper mapper, In value);
 }
-

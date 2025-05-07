@@ -68,7 +68,7 @@ public class PropertyInterfaceAccess<T>
 
     @Override
     public Stream<PropertyContent<?>> read(FastMapper mapper, T value) {
-        return PropertyContents.read(value, _ -> true, reads);
+        return PropertyContents.read(value, reads.values().stream().flatMap(Collection::stream));
     }
 
     private static final Method toStringMethod = ReflectionMethod.of(Object.class, "toString").method();

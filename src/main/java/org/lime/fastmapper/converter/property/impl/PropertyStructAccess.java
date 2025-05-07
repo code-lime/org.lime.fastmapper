@@ -7,6 +7,7 @@ import org.lime.core.common.system.Lazy;
 import org.lime.core.common.system.execute.Action2;
 import org.lime.core.common.system.execute.Func0;
 import org.lime.core.common.system.execute.Func1;
+import org.lime.core.common.system.tuple.Tuple;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.PropertyAccess;
 import org.lime.fastmapper.converter.property.PropertyContent;
@@ -92,13 +93,13 @@ public class PropertyStructAccess<T>
 
     @Override
     public Stream<PropertyContent<?>> read(FastMapper mapper, T value) {
-        return PropertyContents.readSingle(value, _ -> true, fields);
+        return PropertyContents.readSingle(value, fields.values().stream());
     }
 
     @Override
     public T write(FastMapper mapper, Stream<PropertyContent<?>> properties) {
         T value = constructor.invoke();
-        PropertyContents.writeSingle(mapper, value, fields, _ -> true, properties);
+        PropertyContents.writeSingle(mapper, value, fields.values().stream(), properties);
         return value;
     }
 }

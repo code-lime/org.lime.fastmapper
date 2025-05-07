@@ -70,4 +70,34 @@ public interface PropertyAccess<T> extends
                 modifyAccess.modifyWrite())
                 : new Modify<>(this, ImmutableList.of(modify), ImmutableList.of());
     }
+
+    default <In>PropertyAccess<T> modifyWrite(Callable method, Func1<PropertyContent<In>, PropertyContent<?>> modify) {
+        return this.<In>modifyWrite(method, (_, v) -> modify.invoke(v));
+    }
+    default <In>PropertyAccess<T> modifyWrite(Callable method, Func2<FastMapper, PropertyContent<In>, PropertyContent<?>> modify) {
+        return PropertyLoader.extractInfo(LambdaInfo.getMethod(method))
+                .map(PropertyInfo::name)
+                .map(name -> modifyWrite(name, modify))
+                .orElseThrow(() -> new IllegalArgumentException("Property from '"+modify+"' not found"));
+    }
+    default <In>PropertyAccess<T> modifyWrite(String name, Func1<PropertyContent<In>, PropertyContent<?>> modify) {
+        return this.<In>modifyWrite(name, (_, v) -> modify.invoke(v));
+    }
+    default <In>PropertyAccess<T> modifyWrite(String name, Func2<FastMapper, PropertyContent<In>, PropertyContent<?>> modify) {
+        return modifyWrite((mapper, stream) -> stream
+                .map(v -> v.name().equals(name)
+                        ? modify.invoke(mapper, (PropertyContent<In>) v)
+                        : v));
+    }
+    default PropertyAccess<T> modifyWrite(Func2<FastMapper, Stream<PropertyContent<?>>, Stream<PropertyContent<?>>> modify) {
+        return this instanceof Modify<T> modifyAccess
+                ? new Modify<>(
+                modifyAccess.root(),
+                modifyAccess.modifyRead(),
+                ImmutableList.<Func2<FastMapper, Stream<PropertyContent<?>>, Stream<PropertyContent<?>>>>builder()
+                        .addAll(modifyAccess.modifyWrite())
+                        .add(modify)
+                        .build())
+                : new Modify<>(this, ImmutableList.of(), ImmutableList.of(modify));
+    }
 }

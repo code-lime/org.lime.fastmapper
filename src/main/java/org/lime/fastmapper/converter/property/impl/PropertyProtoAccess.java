@@ -13,10 +13,6 @@ public class PropertyProtoAccess<T extends Message, B extends Message.Builder> e
         super(tClass);
     }
 
-    protected PropertyProtoAccess(PropertyBuilderAccess<T, B> other) {
-        super(other);
-    }
-
     @Override
     protected void loadProperties(Class<T> tClass, Class<B> tBuilder, PropertyReadContext<PropertyInfo.Read<?, Method>, Method> readsContext, PropertyWriteContext<PropertyInfo.Write<?, Method>, Method> writesContext) {
         PropertyLoader.loadProperties(tClass, tBuilder, readsContext, writesContext);
