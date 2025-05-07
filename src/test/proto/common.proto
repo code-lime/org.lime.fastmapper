@@ -35,4 +35,24 @@ message Common {
     optional int32 count = 2;
     optional SlotRange range = 3;
   }
+  message Sound {
+    string type = 1;
+    float volume = 2;
+    float pitch = 3;
+    Source source = 4;
+    optional int64 seed = 5;
+
+    enum Source {
+      MASTER = 0;
+      MUSIC = 1;
+      RECORD = 2;
+      WEATHER = 3;
+      BLOCK = 4;
+      HOSTILE = 5;
+      NEUTRAL = 6;
+      PLAYER = 7;
+      AMBIENT = 8;
+      VOICE = 9;
+    }
+  }
 }

@@ -7,8 +7,11 @@ import common.RgbColor;
 import common.entries.Anchor;
 import common.entries.RawEntry;
 import common.entries.TextEntry;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.junit.jupiter.api.Test;
+import org.lime.fastmapper.FastAccess;
 import org.lime.fastmapper.RandomProto;
 import org.lime.fastmapper.test.protobuf.common.Common;
 import org.lime.fastmapper.test.protobuf.oneof.Entry;
@@ -27,7 +30,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class GrpcMapperTest {
     private final FastMapper mapper;
     public GrpcMapperTest() {
-        mapper = FastMapper.create()
+        mapper = FastMapper.create();
+        mapper
+                .addReverse(TypePair.of(Key.class, String.class), (_, v) -> v.asString(), (_, v) -> Key.key(v))
+                .addAuto(TypePair.of(Sound.Source.class, Common.Sound.Source.class))
+                .addAuto(TypePair.of(Sound.class, Common.Sound.class), v -> v
+                        .inOverride(FastAccess.builderAccess(Sound.class, Sound::sound, Sound.Builder::build)
+                                .modifyWriteProperties("seed", vv -> vv
+                                        .mapOptional(true)))
+                        .inModify(vv -> vv
+                                .<Key>modifyRead(Execute.func(Sound::name), content -> content.rename("type"))));
+        mapper
                 .addAuto(TypePair.of(SlotId.class, SlotId.class))
                 .addAuto(TypePair.of(SlotIdTmp.class, SlotId.class))
                 .addAuto(TypePair.of(Common.SlotId.class, SlotId.class))
@@ -213,6 +226,18 @@ class GrpcMapperTest {
         testInverseMap(builder.build(), Entry.Text.class, TextEntry.class);
     }
     @Test
+    void testCustomOptional() {
+        Common.Sound.Builder builder = Common.Sound.newBuilder()
+                .setType("minecraft:aabbcc")
+                .setVolume(1.0f)
+                .setPitch(1.0f)
+                .setSource(Common.Sound.Source.BLOCK)
+                .setSeed(4894951651L);
+        testInverseMap(builder.build(), Common.Sound.class, Sound.class);
+        builder.clearSeed();
+        testInverseMap(builder.build(), Common.Sound.class, Sound.class);
+    }
+    @Test
     void testOneOf() {
         testInverseMap(Entry.newBuilder()
                 .setRaw(Entry.Raw.newBuilder()
@@ -243,7 +268,7 @@ class GrpcMapperTest {
                 .override((v, rnd)
                         -> v.getJavaType().equals(Descriptors.FieldDescriptor.JavaType.STRING)
                         && switch (v.getName()) {
-                    case "font", "key" -> true;
+                    case "font", "key", "type", "static_alt" -> true;
                     default -> false;
                 }
                         ? Optional.of("minecraft:" + rnd.nextString(false, true, false))
