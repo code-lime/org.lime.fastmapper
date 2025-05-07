@@ -36,4 +36,10 @@ public final class PropertyContent<T> {
     public <J>PropertyContent<J> map(ParameterizedType genType, Func1<T, J> map) {
         return new PropertyContent<>(name, genType, (Class<J>) genType.getRawType(), Lazy.of(() -> map.invoke(value())));
     }
+    public PropertyContent<T> update(Func1<T, T> map) {
+        return new PropertyContent<>(name, genType, type, Lazy.of(() -> map.invoke(value())));
+    }
+    public PropertyContent<T> rename(String name) {
+        return new PropertyContent<>(name, genType, type, value);
+    }
 }
