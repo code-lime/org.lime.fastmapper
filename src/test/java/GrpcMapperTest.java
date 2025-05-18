@@ -51,10 +51,6 @@ class GrpcMapperTest {
                                 .setMostSigBits(v.getMostSignificantBits())
                                 .setLeastSigBits(v.getLeastSignificantBits())
                                 .build())
-                .add(TypePair.of(Map.class, Map.class), new MapTypeConverter())
-                .add(TypePair.of(List.class, List.class), new DynamicIterableTypeConverter<>())
-                .add(TypePair.of(Collection.class, Collection.class), new DynamicIterableTypeConverter<>())
-                .add(TypePair.of(Iterable.class, Iterable.class), new DynamicIterableTypeConverter<>())
                 .addAuto(TypePair.of(Common.Font.class, FontData.class),
                         v -> v
                                 .inModify(vv -> vv

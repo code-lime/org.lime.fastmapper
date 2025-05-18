@@ -12,12 +12,12 @@ import org.lime.fastmapper.config.AutoConfig;
 import org.lime.fastmapper.converter.ReverseTypeConverter;
 import org.lime.fastmapper.converter.SimpleTypeConverter;
 import org.lime.fastmapper.converter.TypeConverter;
+import org.lime.fastmapper.converter.impl.DynamicIterableTypeConverter;
+import org.lime.fastmapper.converter.impl.MapTypeConverter;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
@@ -46,7 +46,12 @@ public class FastMapper {
         FastMapper mapper = new FastMapper();
         Primitives.allWrapperTypes().forEach(mapper::addPrimitive);
         mapper.addPrimitive(String.class);
-        return mapper;
+
+        return mapper
+                .add(TypePair.of(Map.class, Map.class), new MapTypeConverter())
+                .add(TypePair.of(List.class, List.class), new DynamicIterableTypeConverter<>())
+                .add(TypePair.of(Collection.class, Collection.class), new DynamicIterableTypeConverter<>())
+                .add(TypePair.of(Iterable.class, Iterable.class), new DynamicIterableTypeConverter<>());
     }
 
     private <T>void addPrimitive(Class<T> tClass) {
