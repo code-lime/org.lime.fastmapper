@@ -261,15 +261,15 @@ class GrpcMapperTest {
     void testRandom() {
         RandomProto rndProto = RandomProto.newRandom()
                 .random(new Random(1))
-                .override((v, rnd)
+                .overrideFields((v, rnd)
                         -> v.getJavaType().equals(Descriptors.FieldDescriptor.JavaType.STRING)
                         && switch (v.getName()) {
-                    case "font", "key", "type", "static_alt" -> true;
-                    default -> false;
-                }
+                            case "font", "key", "type", "static_alt" -> true;
+                            default -> false;
+                        }
                         ? Optional.of("minecraft:" + rnd.nextString(false, true, false))
                         : Optional.empty())
-                .override((v, rnd)
+                .overrideFields((v, rnd)
                         -> v.getJavaType().equals(Descriptors.FieldDescriptor.JavaType.MESSAGE)
                         && v.isRepeated()
                         && v.getMessageType().getFullName().equals("common.Common.Font.CharWidthEntry")
@@ -278,15 +278,11 @@ class GrpcMapperTest {
                         .setField(v.getMessageType().findFieldByName("value"), rnd.nextString(true, true, true, false))
                         .build()))
                         : Optional.empty())
-                .override((v, rnd)
-                        -> v.getJavaType().equals(Descriptors.FieldDescriptor.JavaType.MESSAGE)
-                        && v.getMessageType().getFullName().equals("common.Common.RgbColor")
-                        ? Optional.of(Common.RgbColor.newBuilder()
+                .overrideDescriptors(Common.RgbColor.class, rnd -> Optional.of(Common.RgbColor.newBuilder()
                         .setR(rnd.random().nextInt(6) / (float)5)
                         .setG(rnd.random().nextInt(6) / (float)5)
                         .setB(rnd.random().nextInt(6) / (float)5)
-                        .build())
-                        : Optional.empty());
+                        .build()));
         for (TypePair<?, ?> key : mapper.keys()) {
             if (!Message.class.isAssignableFrom(key.tIn()))
                 continue;
