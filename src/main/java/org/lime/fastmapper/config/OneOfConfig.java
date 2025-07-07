@@ -31,10 +31,7 @@ public class OneOfConfig<In, Out, E extends Enum<E>> {
         this.auto = auto;
         this.eClass = eClass;
         Arrays.stream(eClass.getEnumConstants())
-                .filter(v -> switch (v.name()) {
-                    case "TYPE_NOT_SET" -> false;
-                    default -> true;
-                })
+                .filter(v -> !v.name().endsWith("_NOT_SET"))
                 .forEach(this.elements::add);
     }
 
