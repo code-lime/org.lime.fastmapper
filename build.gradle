@@ -13,8 +13,8 @@ dependencies {
     paperweight.paperDevBundle("${versionPaper}")
 }
 
-apply from: 'https://raw.githubusercontent.com/code-lime/org.lime.core/refs/tags/2.0.3/global.gradle'
-apply from: 'https://raw.githubusercontent.com/code-lime/org.lime.core/refs/tags/2.0.3/version.gradle'
+apply from: 'https://raw.githubusercontent.com/code-lime/org.lime.core/refs/tags/2.0.14/global.gradle'
+apply from: 'https://raw.githubusercontent.com/code-lime/org.lime.core/refs/tags/2.0.14/version.gradle'
 
 println "Project version: $version"
 

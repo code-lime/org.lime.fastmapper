@@ -7,7 +7,7 @@ public class FastMapperPlugin extends CoreInstancePlugin {
 
     @Override
     public String logPrefix() {
-        return "FastMapper";
+        return "FM";
     }
     @Override
     public String configFile() {
