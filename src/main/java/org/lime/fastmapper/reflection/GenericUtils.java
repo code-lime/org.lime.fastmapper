@@ -1,6 +1,7 @@
 package org.lime.fastmapper.reflection;
 
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.lime.core.common.system.execute.Func1;
 
@@ -19,7 +20,18 @@ public class GenericUtils {
         return resultElements;
     }
     public static Set<Method> getAllMethods(Class<?> tClass) {
-        return getAllRecursive(tClass, Class::getDeclaredMethods);
+        var methods = getAllRecursive(tClass, Class::getDeclaredMethods);
+        Set<Method> removes = new HashSet<>();
+        methods.forEach(v -> {
+            var hierarchy = MethodUtils.getOverrideHierarchy(v, ClassUtils.Interfaces.INCLUDE);
+            boolean first = true;
+            for (var method : hierarchy) {
+                if (first) first = false;
+                else removes.add(method);
+            }
+        });
+        methods.removeAll(removes);
+        return methods;
     }
     public static Set<Field> getAllFields(Class<?> tClass) {
         return getAllRecursive(tClass, Class::getDeclaredFields);
