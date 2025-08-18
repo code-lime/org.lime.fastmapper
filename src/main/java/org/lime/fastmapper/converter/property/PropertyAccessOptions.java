@@ -8,8 +8,10 @@ import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.info.PropertyContents;
 import org.lime.fastmapper.converter.property.info.PropertyInfo;
 import org.lime.fastmapper.converter.property.info.PropertyLoader;
+import org.lime.fastmapper.reflection.MethodType;
 
 import java.lang.reflect.Member;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -80,7 +82,7 @@ public interface PropertyAccessOptions<T, E extends Member>
     }
 
     default PropertyAccessOptions<T,E> modifyReadProperties(Callable method, Func1<PropertyInfo.Read<?, E>, PropertyInfo.Read<?, E>> modify) {
-        return PropertyLoader.extractInfo(LambdaInfo.getMethod(method))
+        return PropertyLoader.extractInfo(MethodType.of(accessClass(), LambdaInfo.getMethod(method)))
                 .map(PropertyInfo::name)
                 .map(name -> modifyReadProperties(name, modify))
                 .orElseThrow(() -> new IllegalArgumentException("Property from '"+modify+"' not found"));
@@ -103,7 +105,7 @@ public interface PropertyAccessOptions<T, E extends Member>
     }
 
     default PropertyAccessOptions<T,E> modifyWriteProperties(Callable method, Func1<PropertyInfo.Write<?, E>, PropertyInfo.Write<?, E>> modify) {
-        return PropertyLoader.extractInfo(LambdaInfo.getMethod(method))
+        return PropertyLoader.extractInfo(MethodType.of(accessClass(), LambdaInfo.getMethod(method)))
                 .map(PropertyInfo::name)
                 .map(name -> modifyWriteProperties(name, modify))
                 .orElseThrow(() -> new IllegalArgumentException("Property from '"+modify+"' not found"));

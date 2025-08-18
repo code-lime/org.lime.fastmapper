@@ -3,7 +3,7 @@ package org.lime.fastmapper.converter.property.info;
 import com.google.common.collect.ImmutableMap;
 import org.lime.core.common.system.Lazy;
 import org.lime.core.common.system.execute.Func1;
-import org.lime.fastmapper.GenTypePair;
+import org.lime.fastmapper.reflection.GenericUtils;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Member;
@@ -66,7 +66,7 @@ public interface PropertyReadCreator<T, E extends Member> {
             if (hasReader != null)
                 throw new IllegalArgumentException("hasReader is not null but type is Optional");
             var genType = optionalReader.extractType(info.genType());
-            var optType = GenTypePair.readRawClass(genType);
+            var optType = GenericUtils.readRawClass(genType);
             return (T)create(new PropertyInfo.Impl(
                     info.name(),
                     info.getter(),

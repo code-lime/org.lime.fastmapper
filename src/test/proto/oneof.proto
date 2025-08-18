@@ -56,3 +56,17 @@ message Entry {
     string component = 1;
   }
 }
+
+message Dat {
+  oneof type {
+    One one = 1;
+    Two two = 2;
+  }
+
+  message One {
+    float value = 1;
+  }
+  message Two {
+    string value = 1;
+  }
+}

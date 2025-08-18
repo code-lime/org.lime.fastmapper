@@ -4,33 +4,49 @@ import com.google.protobuf.Message;
 import common.*;
 import common.FontData;
 import common.RgbColor;
+import common.dats.BaseDat;
+import common.dats.OneDat;
 import common.entries.Anchor;
 import common.entries.RawEntry;
 import common.entries.TextEntry;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.junit.jupiter.api.Test;
+import org.lime.core.common.reflection.LambdaInfo;
 import org.lime.fastmapper.FastAccess;
 import org.lime.fastmapper.RandomProto;
 import org.lime.fastmapper.test.protobuf.common.Common;
 import org.lime.fastmapper.test.protobuf.oneof.Entry;
+import org.lime.fastmapper.test.protobuf.oneof.Dat;
 import org.lime.core.common.system.execute.Execute;
 import org.lime.core.common.system.tuple.Tuple;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.TypePair;
-import org.lime.fastmapper.converter.impl.DynamicIterableTypeConverter;
-import org.lime.fastmapper.converter.impl.MapTypeConverter;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class GrpcMapperTest {
     private final FastMapper mapper;
     public GrpcMapperTest() {
+        var rr = OneDat.class;
+        var r0 = rr.getMethods();
+        var r1 = Stream.of(rr.getMethods())
+                .map(v -> TypeUtils.unrollVariables(TypeUtils.getTypeArguments(rr, v.getDeclaringClass()), v.getGenericReturnType()))
+                .toList();
+        var result = LambdaInfo.getMethod(Execute.func(OneDat::value));
+        var result2 = LambdaInfo.infoFromLambda(Execute.func(OneDat::value));
+
         mapper = FastMapper.create();
+        mapper
+                .addAuto(TypePair.of(Dat.class, common.dats.BaseDat.class), v -> v
+                        .oneOf(Dat::getTypeCase, vv -> vv
+                                .withNamed((_,name) -> name + "Dat", (a,b) -> mapper.addAuto(TypePair.of(a,b)))));
         mapper
                 .addReverse(TypePair.of(Key.class, String.class), (_, v) -> v.asString(), (_, v) -> Key.key(v))
                 .addAuto(TypePair.of(Sound.Source.class, Common.Sound.Source.class))
@@ -179,6 +195,14 @@ class GrpcMapperTest {
         testInverseMap(Entry.Raw.newBuilder()
                 .setComponent("AABBCC")
                 .build(), RawEntry.class);
+    }
+    @Test
+    void testGeneric() {
+        testInverseMap(Dat.newBuilder()
+                .setOne(Dat.One.newBuilder()
+                        .setValue(1)
+                        .build())
+                .build(), BaseDat.class);
     }
     @Test
     void testCollection() {

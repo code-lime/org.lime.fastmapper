@@ -12,6 +12,9 @@ import org.lime.core.common.system.execute.Func1;
 import org.lime.core.common.system.execute.Func2;
 import org.lime.core.common.system.tuple.Tuple;
 import org.lime.core.common.system.tuple.Tuple2;
+import org.lime.fastmapper.reflection.MethodType;
+import org.lime.fastmapper.reflection.TypeAnalyzer;
+import org.lime.fastmapper.reflection.GenericUtils;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
@@ -58,25 +61,29 @@ public class PropertyLoader {
                 : Optional.empty();
     }
 
-    public static Optional<PropertyInfo<?, Method>> extractInfo(Method method) {
-        return extractInfo(method, void.class);
+    public static Optional<PropertyInfo<?, Method>> extractInfo(MethodType methodType) {
+        return extractInfo(methodType, void.class);
     }
-    public static Optional<PropertyInfo<?, Method>> extractInfo(Method method, Class<?> tReturn) {
+    public static Optional<PropertyInfo<?, Method>> extractInfo(MethodType methodType, Class<?> tReturn) {
+        Method method = methodType.method();
         if (method.isBridge() || method.getDeclaringClass().equals(Object.class))
             return Optional.empty();
         int modifiers = method.getModifiers();
         if (Modifier.isStatic(modifiers) || !Modifier.isPublic(modifiers))
             return Optional.empty();
+
+        Class<?> returnClass = GenericUtils.readRawClass(methodType.returnType());
+
         String name = method.getName();
         boolean isGetter;
         switch (method.getParameterCount()) {
             case 0:
-                if (method.getReturnType() == void.class || method.getReturnType() == tReturn)
+                if (returnClass == void.class || returnClass == tReturn)
                     return Optional.empty();
                 isGetter = true;
                 break;
             case 1:
-                if (method.getReturnType() != tReturn)
+                if (returnClass != tReturn)
                     return Optional.empty();
                 isGetter = false;
                 break;
@@ -110,11 +117,11 @@ public class PropertyLoader {
         Class<?> mClass;
         Type mType;
         if (isGetter) {
-            mClass = method.getReturnType();
-            mType = method.getGenericReturnType();
+            mClass = returnClass;
+            mType = methodType.returnType();
         } else {
-            mClass = method.getParameterTypes()[0];
-            mType = method.getGenericParameterTypes()[0];
+            mType = methodType.arguments().getFirst();
+            mClass = GenericUtils.readRawClass(mType);
         }
         for (var postfix : postfix) {
             var dat = readPostfix(name, mClass, postfix);
@@ -137,43 +144,45 @@ public class PropertyLoader {
             @Nullable PropertyReadContext<R, Method> reads,
             @Nullable PropertyWriteContext<W, Method> writes,
             Class<?> tReturn) {
-        for (Method method : tClass.getMethods()) {
-            extractInfo(method, tReturn)
-                    .ifPresent(info -> {
-                        ReflectionMethod hasReaderMethod = null;
-                        try {
-                            hasReaderMethod = ReflectionMethod.of(tClass, "has" + toFirstUpper(info.name()));
-                        } catch (Throwable _) {
+        TypeAnalyzer.of(tClass)
+                .methods()
+                .forEach(methodType -> extractInfo(methodType, tReturn)
+                        .ifPresent(info -> {
+                            ReflectionMethod hasReaderMethod = null;
+                            try {
+                                hasReaderMethod = ReflectionMethod.of(tClass, "has" + toFirstUpper(info.name()));
+                            } catch (Throwable _) {
 
-                        }
-
-                        if (info.getter()) {
-                            if (reads != null) {
-                                Func1<Object, Boolean> hasReader = hasReaderMethod == null ? null : hasReaderMethod.lambda(Func1.class);
-                                reads.add(info, hasReader, Lambda.lambda(method, Func1.class));
                             }
-                        } else {
-                            if (writes != null) {
-                                Action2 write;
-                                if (tReturn == void.class) {
-                                    write = Lambda.lambda(method, Action2.class);
-                                } else {
-                                    Func2<Object, Object, Object> inv = Lambda.lambda(method, Func2.class);
-                                    write = Execute.action(inv::invoke);
+
+                            if (info.getter()) {
+                                if (reads != null) {
+                                    Func1<Object, Boolean> hasReader = hasReaderMethod == null ? null : hasReaderMethod.lambda(Func1.class);
+                                    reads.add(info, hasReader, Lambda.lambda(methodType.method(), Func1.class));
                                 }
-                                writes.add(info, hasReaderMethod != null, write);
+                            } else {
+                                if (writes != null) {
+                                    Action2 write;
+                                    if (tReturn == void.class) {
+                                        write = Lambda.lambda(methodType.method(), Action2.class);
+                                    } else {
+                                        Func2<Object, Object, Object> inv = Lambda.lambda(methodType.method(), Func2.class);
+                                        write = Execute.action(inv::invoke);
+                                    }
+                                    writes.add(info, hasReaderMethod != null, write);
+                                }
                             }
-                        }
-                    });
-        }
+                        }));
     }
+
     public static final Func1<Descriptors.FieldDescriptor, Boolean> hasOptionalKeyword = ReflectionMethod.of(Descriptors.FieldDescriptor.class, "hasOptionalKeyword").lambda(Func1.class);
-    public static <T extends Message, B extends Message.Builder, R, W>void loadProperties(
+
+    public static <T extends Message, B extends Message.Builder, R, W> void loadProperties(
             Class<T> tClass,
             Class<B> bClass,
             @Nullable PropertyReadContext<R, Method> reads,
             @Nullable PropertyWriteContext<W, Method> writes) {
-        Descriptors.Descriptor descriptor = (Descriptors.Descriptor)ReflectionMethod
+        Descriptors.Descriptor descriptor = (Descriptors.Descriptor) ReflectionMethod
                 .of(tClass, "getDescriptor")
                 .call(new Object[0]);
         var fields = descriptor.getFields();
@@ -185,9 +194,9 @@ public class PropertyLoader {
             if (field.isMapField()) postfix = "Map";
             else if (field.isRepeated()) postfix = "List";
             else postfix = "";
-            Method getMethod = ReflectionMethod.of(tClass, "get" + javaName + postfix).method();
-            Type genType = getMethod.getGenericReturnType();;
-            Class<?> type = getMethod.getReturnType();
+            MethodType getMethod = MethodType.of(tClass, ReflectionMethod.of(tClass, "get" + javaName + postfix).method());
+            Type genType = getMethod.returnType();
+            Class<?> type = GenericUtils.readRawClass(getMethod.returnType());
 
             Type genTypeSet;
             Class<?> typeSet = type;
@@ -196,11 +205,10 @@ public class PropertyLoader {
             else if (field.isRepeated()) {
                 typeSet = Iterable.class;
                 setPrefix = "addAll";
-            }
-            else setPrefix = "set";
-            Method setMethod = ReflectionMethod.of(bClass, setPrefix + javaName, typeSet).method();
-            var getValue = Lambda.lambda(getMethod, Func1.class);
-            var setValue = Lambda.lambda(setMethod, Func2.class);
+            } else setPrefix = "set";
+            MethodType setMethod = MethodType.of(bClass, ReflectionMethod.of(bClass, setPrefix + javaName, typeSet).method());
+            var getValue = Lambda.lambda(getMethod.method(), Func1.class);
+            var setValue = Lambda.lambda(setMethod.method(), Func2.class);
             Func1<Object, Boolean> hasValue;
             if (hasOptionalKeyword.invoke(field) || field.getContainingOneof() != null) {
                 Method hasMethod = ReflectionMethod.of(tClass, "has" + javaName).method();
@@ -208,10 +216,10 @@ public class PropertyLoader {
             } else {
                 hasValue = null;
             }
-            genTypeSet = setMethod.getGenericParameterTypes()[0];
+            genTypeSet = setMethod.arguments().getFirst();
             boolean optional = hasValue != null;
-            reads.add(new PropertyInfo.Impl(name, true, true, getMethod, genType, type), hasValue, getValue);
-            writes.add(new PropertyInfo.Impl(name, false, true, setMethod, genTypeSet, typeSet), optional, (a,b) -> setValue.invoke(a,b));
+            reads.add(new PropertyInfo.Impl(name, true, true, getMethod.method(), genType, type), hasValue, getValue);
+            writes.add(new PropertyInfo.Impl(name, false, true, setMethod.method(), genTypeSet, typeSet), optional, (a, b) -> setValue.invoke(a, b));
         }
     }
 }
