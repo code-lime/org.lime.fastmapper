@@ -8,31 +8,31 @@ import java.lang.reflect.*;
 import java.util.*;
 
 public class GenericUtils {
-    private static <T>List<T> getAllRecursive(Class<?> tClass, Func1<Class<?>, T[]> extract) {
-        final List<Class<?>> classes = getAllSuperclassesAndInterfaces(tClass);
-        classes.addFirst(tClass);
-        final List<T> resultElements = new ArrayList<>();
+    private static <T>Set<T> getAllRecursive(Class<?> tClass, Func1<Class<?>, T[]> extract) {
+        final Set<Class<?>> classes = getAllSuperclassesAndInterfaces(tClass);
+        classes.add(tClass);
+        final Set<T> resultElements = new HashSet<>();
         classes.forEach(current -> {
             final T[] methods = extract.apply(current);
             Collections.addAll(resultElements, methods);
         });
         return resultElements;
     }
-    public static List<Method> getAllMethods(Class<?> tClass) {
+    public static Set<Method> getAllMethods(Class<?> tClass) {
         return getAllRecursive(tClass, Class::getDeclaredMethods);
     }
-    public static List<Field> getAllFields(Class<?> tClass) {
+    public static Set<Field> getAllFields(Class<?> tClass) {
         return getAllRecursive(tClass, Class::getDeclaredFields);
     }
-    public static List<Constructor<?>> getAllConstructors(Class<?> tClass) {
+    public static Set<Constructor<?>> getAllConstructors(Class<?> tClass) {
         return getAllRecursive(tClass, Class::getDeclaredConstructors);
     }
 
-    public static List<Class<?>> getAllSuperclassesAndInterfaces(final Class<?> tClass) {
+    public static Set<Class<?>> getAllSuperclassesAndInterfaces(final Class<?> tClass) {
         if (tClass == null)
             return null;
 
-        final List<Class<?>> allSuperClassesAndInterfaces = new ArrayList<>();
+        final Set<Class<?>> allSuperClassesAndInterfaces = new HashSet<>();
         final List<Class<?>> allSuperclasses = ClassUtils.getAllSuperclasses(tClass);
         int superClassIndex = 0;
         final List<Class<?>> allInterfaces = ClassUtils.getAllInterfaces(tClass);
