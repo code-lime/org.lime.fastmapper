@@ -70,3 +70,13 @@ message Dat {
     string value = 1;
   }
 }
+
+message Model {
+  oneof data {
+    Point point = 1;
+  }
+
+  message Point {
+    optional common.Common.SlotRange range = 1;
+  }
+}
