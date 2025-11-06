@@ -5,11 +5,11 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Streams;
 import org.lime.core.common.reflection.ReflectionMethod;
-import org.lime.core.common.system.Lazy;
-import org.lime.core.common.system.execute.Action2;
-import org.lime.core.common.system.execute.Execute;
-import org.lime.core.common.system.execute.Func1;
-import org.lime.core.common.system.execute.Func2;
+import org.lime.core.common.utils.Lazy;
+import org.lime.core.common.utils.execute.Action2;
+import org.lime.core.common.utils.execute.Execute;
+import org.lime.core.common.utils.execute.Func1;
+import org.lime.core.common.utils.execute.Func2;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.PropertyAccess;
 import org.lime.fastmapper.converter.property.PropertyContent;
@@ -137,7 +137,7 @@ public class OneOfConfig<In, Out, E extends Enum<E>> {
     private <T extends Out>PropertyEnum<Out, E, ?> createProperty(E element, String name, Class<T> tClass) {
         String javaName = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, element.name());
         Class<In> accessClass = auto.inClass();
-        var getMethod = ReflectionMethod.of(accessClass, "get" + javaName).method();
+        var getMethod = ReflectionMethod.of(accessClass, "get" + javaName).target();
         var getMod = getMethod.getModifiers();
         Class<?> tRet = getMethod.getReturnType();
         if (Modifier.isStatic(getMod) || !Modifier.isPublic(getMod) || tRet.equals(void.class))

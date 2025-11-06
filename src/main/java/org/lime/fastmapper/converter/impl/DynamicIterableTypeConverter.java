@@ -1,6 +1,6 @@
 package org.lime.fastmapper.converter.impl;
 
-import org.lime.core.common.system.tuple.Tuple2;
+import org.lime.core.common.utils.tuple.Tuple2;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.GenTypePair;
 import org.lime.fastmapper.converter.TypeConverter;

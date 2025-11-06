@@ -1,7 +1,7 @@
 package org.lime.fastmapper.converter.property.info;
 
-import org.lime.core.common.system.tuple.Tuple;
-import org.lime.core.common.system.utils.IterableUtils;
+import org.lime.core.common.utils.tuple.Tuple;
+import org.lime.core.common.utils.IterableUtils;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.PropertyContent;
 

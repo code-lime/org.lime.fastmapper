@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.Nullable;
 import org.lime.core.common.reflection.ReflectionMethod;
-import org.lime.core.common.system.execute.Func0;
-import org.lime.core.common.system.execute.Func1;
+import org.lime.core.common.utils.execute.Func1;
+import org.lime.core.common.utils.execute.Func0;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.PropertyAccessOptions;
 import org.lime.fastmapper.converter.property.PropertyContent;
@@ -49,7 +49,7 @@ public class PropertyBuilderAccess<T, B> implements
 
         if (newBuilderFunc == null) {
             var builderRefMethod = ReflectionMethod.of(tClass, "newBuilder");
-            var builderMethod = builderRefMethod.method();
+            var builderMethod = builderRefMethod.target();
             if (!Modifier.isStatic(builderMethod.getModifiers())
                     || !builderMethod.getReturnType().equals(tBuilder)
                     || builderMethod.getParameterCount() != 0)
@@ -60,7 +60,7 @@ public class PropertyBuilderAccess<T, B> implements
 
         if (buildFunc == null) {
             var buildRefMethod = ReflectionMethod.of(tBuilder, "build");
-            var buildMethod = buildRefMethod.method();
+            var buildMethod = buildRefMethod.target();
             if (Modifier.isStatic(buildMethod.getModifiers())
                     || !buildMethod.getReturnType().equals(tClass)
                     || buildMethod.getParameterCount() != 0)

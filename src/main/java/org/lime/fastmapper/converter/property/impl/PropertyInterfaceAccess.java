@@ -2,8 +2,8 @@ package org.lime.fastmapper.converter.property.impl;
 
 import com.google.common.collect.ImmutableMap;
 import org.lime.core.common.reflection.ReflectionMethod;
-import org.lime.core.common.system.Lazy;
-import org.lime.core.common.system.execute.Func1;
+import org.lime.core.common.utils.Lazy;
+import org.lime.core.common.utils.execute.Func1;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.PropertyAccess;
 import org.lime.fastmapper.converter.property.PropertyContent;
@@ -71,7 +71,7 @@ public class PropertyInterfaceAccess<T>
         return PropertyContents.read(value, reads.values().stream().flatMap(Collection::stream));
     }
 
-    private static final Method toStringMethod = ReflectionMethod.of(Object.class, "toString").method();
+    private static final Method toStringMethod = ReflectionMethod.of(Object.class, "toString").target();
     @Override
     public T write(FastMapper mapper, Stream<PropertyContent<?>> properties) {
         Map<Method, Object> values = new HashMap<>();

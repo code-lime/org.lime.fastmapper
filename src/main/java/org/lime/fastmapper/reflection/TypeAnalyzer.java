@@ -1,6 +1,6 @@
 package org.lime.fastmapper.reflection;
 
-import org.lime.core.common.system.Lazy;
+import org.lime.core.common.utils.Lazy;
 
 import java.lang.reflect.Type;
 import java.util.List;

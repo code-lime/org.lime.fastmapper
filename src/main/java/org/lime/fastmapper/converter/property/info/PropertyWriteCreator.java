@@ -1,6 +1,6 @@
 package org.lime.fastmapper.converter.property.info;
 
-import org.lime.core.common.system.execute.Action2;
+import org.lime.core.common.utils.execute.Action2;
 
 import java.lang.reflect.Member;
 

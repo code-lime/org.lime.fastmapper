@@ -2,8 +2,8 @@ package org.lime.fastmapper.converter.property;
 
 import com.google.common.collect.ImmutableList;
 import org.lime.core.common.reflection.LambdaInfo;
-import org.lime.core.common.system.execute.Callable;
-import org.lime.core.common.system.execute.Func1;
+import org.lime.core.common.utils.execute.Callable;
+import org.lime.core.common.utils.execute.Func1;
 import org.lime.fastmapper.FastMapper;
 import org.lime.fastmapper.converter.property.info.PropertyContents;
 import org.lime.fastmapper.converter.property.info.PropertyInfo;

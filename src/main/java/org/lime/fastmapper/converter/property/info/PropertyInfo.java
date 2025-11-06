@@ -1,6 +1,6 @@
 package org.lime.fastmapper.converter.property.info;
 
-import org.lime.core.common.system.Lazy;
+import org.lime.core.common.utils.Lazy;
 
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;

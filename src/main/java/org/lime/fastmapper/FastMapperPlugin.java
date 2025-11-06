@@ -1,16 +1,12 @@
 package org.lime.fastmapper;
 
-import org.lime.core.paper.CoreInstancePlugin;
+import org.lime.core.paper.BasePaperInstanceModule;
+import org.lime.core.paper.BasePaperPlugin;
 
-public class FastMapperPlugin extends CoreInstancePlugin {
-    public static FastMapperPlugin instance;
-
+public class FastMapperPlugin
+        extends BasePaperPlugin {
     @Override
-    public String logPrefix() {
-        return "FM";
-    }
-    @Override
-    public String configFile() {
-        return "plugins/fastmapper/";
+    protected BasePaperInstanceModule<Instance> createModule(Instance instance) {
+        return new BasePaperInstanceModule<>(instance);
     }
 }

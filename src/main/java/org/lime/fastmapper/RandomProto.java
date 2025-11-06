@@ -5,9 +5,9 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Message;
 import org.lime.core.common.reflection.ReflectionMethod;
-import org.lime.core.common.system.execute.Func0;
-import org.lime.core.common.system.execute.Func1;
-import org.lime.core.common.system.execute.Func2;
+import org.lime.core.common.utils.execute.Func0;
+import org.lime.core.common.utils.execute.Func1;
+import org.lime.core.common.utils.execute.Func2;
 import org.lime.fastmapper.converter.property.info.PropertyLoader;
 
 import java.util.*;
@@ -133,7 +133,7 @@ public class RandomProto {
     }
     private Message.Builder builderForClass(Class<? extends Message> tClass) {
         var method = ReflectionMethod.of(tClass, "newBuilder");
-        if (!method.isStatic() || !Message.Builder.class.isAssignableFrom(method.method().getReturnType()))
+        if (!method.isStatic() || !Message.Builder.class.isAssignableFrom(method.target().getReturnType()))
             throw new IllegalArgumentException("newBuilder method not found");
         return (Message.Builder)method.call(new Object[0]);
     }

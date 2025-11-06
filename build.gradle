@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id "io.papermc.paperweight.userdev" version "+"
+    id 'io.papermc.paperweight.userdev' version '2.0.0-beta.18'
     id "fr.brouillard.oss.gradle.jgitver" version "+"
     id 'com.google.protobuf' version "${versionProtobufGradle}"
 }
@@ -13,8 +13,9 @@ dependencies {
     paperweight.paperDevBundle("${versionPaper}")
 }
 
-apply from: 'https://raw.githubusercontent.com/code-lime/org.lime.core/refs/tags/2.0.14/global.gradle'
-apply from: 'https://raw.githubusercontent.com/code-lime/org.lime.core/refs/tags/2.0.14/version.gradle'
+apply from: 'https://raw.githubusercontent.com/code-lime/org.lime.core/refs/tags/3.1.1/global.gradle'
+apply from: 'https://raw.githubusercontent.com/code-lime/org.lime.core/refs/tags/3.1.1/version.gradle'
+apply from: 'https://raw.githubusercontent.com/code-lime/org.lime.core/refs/tags/3.1.1/remote.gradle'
 
 println "Project version: $version"
 
@@ -106,7 +107,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.lime:core:${versionCore}"
+    implementation "org.lime:core.paper:${versionCore}"
 }
 //</editor-fold>
 //</editor-fold>

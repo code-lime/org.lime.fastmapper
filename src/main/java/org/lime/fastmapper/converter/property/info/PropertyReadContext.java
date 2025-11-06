@@ -1,7 +1,7 @@
 package org.lime.fastmapper.converter.property.info;
 
-import org.lime.core.common.system.Lazy;
-import org.lime.core.common.system.execute.Func1;
+import org.lime.core.common.utils.Lazy;
+import org.lime.core.common.utils.execute.Func1;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Member;

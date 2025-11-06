@@ -2,10 +2,10 @@ package org.lime.fastmapper;
 
 import com.google.protobuf.Message;
 import org.jetbrains.annotations.Nullable;
-import org.lime.core.common.system.execute.Func0;
-import org.lime.core.common.system.execute.Func1;
-import org.lime.core.common.system.tuple.Tuple;
-import org.lime.core.common.system.tuple.Tuple2;
+import org.lime.core.common.utils.execute.Func0;
+import org.lime.core.common.utils.execute.Func1;
+import org.lime.core.common.utils.tuple.Tuple;
+import org.lime.core.common.utils.tuple.Tuple2;
 import org.lime.fastmapper.converter.PropertyAccessTypeConverter;
 import org.lime.fastmapper.converter.PropertyTypeConverter;
 import org.lime.fastmapper.converter.property.PropertyAccess;

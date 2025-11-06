@@ -3,7 +3,7 @@ package org.lime.fastmapper.reflection;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
-import org.lime.core.common.system.execute.Func1;
+import org.lime.core.common.utils.execute.Func1;
 
 import java.lang.reflect.*;
 import java.util.*;

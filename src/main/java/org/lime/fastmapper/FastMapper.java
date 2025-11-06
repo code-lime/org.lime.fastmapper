@@ -2,12 +2,12 @@ package org.lime.fastmapper;
 
 import com.google.common.collect.Streams;
 import com.google.common.primitives.Primitives;
-import org.lime.core.common.system.execute.Action0;
-import org.lime.core.common.system.execute.Func1;
-import org.lime.core.common.system.tuple.LockTuple1;
-import org.lime.core.common.system.tuple.Tuple;
-import org.lime.core.common.system.tuple.Tuple1;
-import org.lime.core.common.system.tuple.Tuple2;
+import org.lime.core.common.utils.execute.Action0;
+import org.lime.core.common.utils.execute.Func1;
+import org.lime.core.common.utils.tuple.LockTuple1;
+import org.lime.core.common.utils.tuple.Tuple;
+import org.lime.core.common.utils.tuple.Tuple1;
+import org.lime.core.common.utils.tuple.Tuple2;
 import org.lime.fastmapper.config.AutoConfig;
 import org.lime.fastmapper.converter.ReverseTypeConverter;
 import org.lime.fastmapper.converter.SimpleTypeConverter;

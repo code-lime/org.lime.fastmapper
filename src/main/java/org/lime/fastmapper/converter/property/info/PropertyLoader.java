@@ -6,12 +6,12 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import org.lime.core.common.reflection.Lambda;
 import org.lime.core.common.reflection.ReflectionMethod;
-import org.lime.core.common.system.execute.Action2;
-import org.lime.core.common.system.execute.Execute;
-import org.lime.core.common.system.execute.Func1;
-import org.lime.core.common.system.execute.Func2;
-import org.lime.core.common.system.tuple.Tuple;
-import org.lime.core.common.system.tuple.Tuple2;
+import org.lime.core.common.utils.execute.Action2;
+import org.lime.core.common.utils.execute.Execute;
+import org.lime.core.common.utils.execute.Func1;
+import org.lime.core.common.utils.execute.Func2;
+import org.lime.core.common.utils.tuple.Tuple;
+import org.lime.core.common.utils.tuple.Tuple2;
 import org.lime.fastmapper.reflection.MethodType;
 import org.lime.fastmapper.reflection.TypeAnalyzer;
 import org.lime.fastmapper.reflection.GenericUtils;
@@ -194,7 +194,7 @@ public class PropertyLoader {
             if (field.isMapField()) postfix = "Map";
             else if (field.isRepeated()) postfix = "List";
             else postfix = "";
-            MethodType getMethod = MethodType.of(tClass, ReflectionMethod.of(tClass, "get" + javaName + postfix).method());
+            MethodType getMethod = MethodType.of(tClass, ReflectionMethod.of(tClass, "get" + javaName + postfix).target());
             Type genType = getMethod.returnType();
             Class<?> type = GenericUtils.readRawClass(getMethod.returnType());
 
@@ -206,12 +206,12 @@ public class PropertyLoader {
                 typeSet = Iterable.class;
                 setPrefix = "addAll";
             } else setPrefix = "set";
-            MethodType setMethod = MethodType.of(bClass, ReflectionMethod.of(bClass, setPrefix + javaName, typeSet).method());
+            MethodType setMethod = MethodType.of(bClass, ReflectionMethod.of(bClass, setPrefix + javaName, typeSet).target());
             var getValue = Lambda.lambda(getMethod.method(), Func1.class);
             var setValue = Lambda.lambda(setMethod.method(), Func2.class);
             Func1<Object, Boolean> hasValue;
             if (hasOptionalKeyword.invoke(field) || field.getContainingOneof() != null) {
-                Method hasMethod = ReflectionMethod.of(tClass, "has" + javaName).method();
+                Method hasMethod = ReflectionMethod.of(tClass, "has" + javaName).target();
                 hasValue = Lambda.lambda(hasMethod, Func1.class);
             } else {
                 hasValue = null;
